@@ -39,6 +39,12 @@
 /**
  * You should add more #includes here
  */
+#include "EZ-Template/api.hpp"
+#include "ports.hpp"
+#include "autons.hpp"
+#include "Catapult.hpp"
+#include "intakes.hpp"
+
 //#include "okapi/api.hpp"
 //#include "pros/api_legacy.h"
 

@@ -1,51 +1,100 @@
 #include "main.h"
 
+
+// For instalattion, upgrading, documentations and tutorials, check out website!
+// https://ez-robotics.github.io/EZ-Template/
+
+
+
+
+Drive chassis(
+    // Left Chassis Ports (negative port will reverse it!)
+    //   the first port is the sensored port (when trackers are not used!)
+    {-8, -9, -10}
+
+    // Right Chassis Ports (negative port will reverse it!)
+    //   the first port is the sensored port (when trackers are not used!)
+    ,
+    {1, 2, 3}
+
+    // IMU Port
+    ,
+    5
+
+    // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
+    //    (or tracking wheel diameter)
+    ,
+    2.75
+
+    // Cartridge RPM
+    //   (or tick per rotation if using tracking wheels)
+    ,
+    600
+
+    // External Gear Ratio (MUST BE DECIMAL)
+    //    (or gear ratio of tracking wheel)
+    // eg. if your drive is 84:36 where the 36t is powered, your RATIO would
+    // be 2.333. eg. if your drive is 36:60 where the 60t is powered, your RATIO
+    // would be 0.6.
+    ,
+    1.15
+
+    // Uncomment if using tracking wheels
+    /*
+    // Left Tracking Wheel Ports (negative port will reverse it!)
+    // ,{1, 2} // 3 wire encoder
+    // ,8 // Rotation sensor
+
+    // Right Tracking Wheel Ports (negative port will reverse it!)
+    // ,{-3, -4} // 3 wire encoder
+    // ,-9 // Rotation sensor
+    */
+
+    // Uncomment if tracking wheels are plugged into a 3 wire expander
+    // 3 Wire Port Expander Smart Port
+    // ,1
+);
+
+
+
+
 /**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
+  ___       _ _   _       _ _         
+ |_ _|_ __ (_) |_(_) __ _| (_)_______ 
+  | || '_ \| | __| |/ _` | | |_  / _ \
+  | || | | | | |_| | (_| | | |/ /  __/
+ |___|_| |_|_|\__|_|\__,_|_|_/___\___|
+                                      
+*/
+void initialize()
+{
+  // ez::print_ez_template();
+  pros::delay(500); // Wait for legacy ports configure.
+
+
+  // Configure your chassis controls
+  chassis.toggle_modify_curve_with_controller(false);
+  chassis.set_active_brake(0.01); // Sets the active brake kP. We recommend 0.1.
+  chassis.set_curve_default(5, 5);
+  default_constants();
+  exit_condition_defaults();
+
+
+  ez::as::auton_selector.add_autons({
+    Auton("You know exactly what the fuck goin on", Frenzy_Rush_Mid),
+    Auton("Cope Seethe", Default)
+  });
+  chassis.initialize();
+  ez::as::initialize();
+
+  pros::Task Catapult(Catapult_Down); //cata reloads constantly
+
 }
 
-/**
- * Runs initialization code. This occurs as soon as the program is started.
- *
- * All other competition modes are blocked by initialize; it is recommended
- * to keep execution time for this mode under a few seconds.
- */
-void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
 
-	pros::lcd::register_btn1_cb(on_center_button);
-}
 
-/**
- * Runs while the robot is in the disabled state of Field Management System or
- * the VEX Competition Switch, following either autonomous or opcontrol. When
- * the robot is enabled, this task will exit.
- */
-void disabled() {}
 
-/**
- * Runs after initialize(), and before autonomous when connected to the Field
- * Management System or the VEX Competition Switch. This is intended for
- * competition-specific initialization routines, such as an autonomous selector
- * on the LCD.
- *
- * This task will exit when the robot is enabled and autonomous or opcontrol
- * starts.
- */
-void competition_initialize() {}
+
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -58,7 +107,17 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+  chassis.reset_pid_targets();               // Resets PID targets to 0
+  chassis.reset_gyro();                      // Reset gyro position to 0
+  chassis.reset_drive_sensor();              // Reset drive sensors to 0
+  chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps
+                                             // autonomous consistency.
+//ez::as::auton_selector.call_selected_auton();
+Frenzy_Rush_Mid();
+
+ 
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -73,21 +132,66 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
 
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
 
-		left_mtr = left;
-		right_mtr = right;
+void opcontrol()
+{
 
-		pros::delay(20);
-	}
+  chassis.set_drive_brake(MOTOR_BRAKE_COAST);
+  pros::Task IntakeControlTask(Intake_Control);
+  pros::Task IntakeActuation(Intake_Actuate);
+  pros::Task wingActuation(wingsActuate);
+
+  while (true)
+  {
+
+    chassis.arcade_flipped(ez::SINGLE);
+	if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1))
+    {
+      Catapult_Fire();
+    }
+
+    pros::delay(20);
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Runs while the robot is in the disabled state of Field Management System or
+ * the VEX Competition Switch, following either autonomous or opcontrol. When
+ * the robot is enabled, this task will exit.
+ */
+void disabled() { }
+
+
+
+
+
+/**
+ * Runs after initialize(), and before autonomous when connected to the Field
+ * Management System or the VEX Competition Switch. This is intended for
+ * competition-specific initialization routines, such as an autonomous selector
+ * on the LCD.
+ *
+ * This task will exit when the robot is enabled and autonomous or opcontrol
+ * starts.
+ */
+void competition_initialize() { }
