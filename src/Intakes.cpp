@@ -33,11 +33,11 @@ void Intake_Actuate(void *)
     if ((master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)))
     {
       
-      IntakeActuator.move_velocity(100);
+      IntakeActuator.move_velocity(-100);
     }
     else if((master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)))
     {
-      IntakeActuator.move_velocity(-100);
+      IntakeActuator.move_velocity(100);
     }
     else
     {
@@ -54,15 +54,23 @@ void Intake_Auto(int x) {
     
 }
 
-void Actuate_Auto(bool active)
+void Actuate_Auto(string x)
 {
-  if(active = true)
+  if(x == "in")
   {
-    IntakeActuator.move_absolute(180, 100);
+    while(IntakeActuate1.get_position() > 0)
+    {
+      IntakeActuator.move_velocity(-100);
+    }
+    IntakeActuator.move_velocity(0);
   }
-  else
+  else if(x == "out")
   {
-    IntakeActuator.move_absolute(0, 100);
+    while(IntakeActuate1.get_position() < 270)
+    {
+      IntakeActuator.move_velocity(100);
+    }
+    IntakeActuator.move_velocity(0);
   }
 }
 
@@ -81,4 +89,9 @@ void wingsActuate(void *)
 
     pros::delay(20);
   }
+}
+
+void wingsAuto(bool x)
+{
+  wings.set_value(x);
 }

@@ -78,6 +78,7 @@ void initialize()
   chassis.set_curve_default(5, 5);
   default_constants();
   exit_condition_defaults();
+  IntakeActuator.tare_position();
 
 
   ez::as::auton_selector.add_autons({
@@ -114,7 +115,24 @@ void autonomous() {
   chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps
                                              // autonomous consistency.
 //ez::as::auton_selector.call_selected_auton();
-Frenzy_Rush_Mid();
+//Frenzy_Rush_Mid();
+//////////////////////////////
+//the diff auton functions here ya go
+/*
+Intake_Auto(200);
+Actuate_Auto("out");
+pros::delay(250);
+Catapult_Fire();
+pros::delay(1000);
+Intake_Auto(0);
+Actuate_Auto("in");
+wingsAuto(true);
+pros::delay(2000);
+Actuate_Auto("out");
+pros::delay(250);
+Intake_Auto(-100);
+wingsAuto(false);
+*/
 
  
 }
