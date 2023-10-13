@@ -115,7 +115,7 @@ void autonomous() {
   chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps
                                              // autonomous consistency.
 //ez::as::auton_selector.call_selected_auton();
-//Frenzy_Rush_Mid();
+Default();
 //////////////////////////////
 //the diff auton functions here ya go
 /*

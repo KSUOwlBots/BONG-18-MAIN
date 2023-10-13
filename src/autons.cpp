@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/rtos.hpp"
 
 /////
 // For instalattion, upgrading, documentations and tutorials, check out website!
@@ -128,6 +129,123 @@ void Frenzy_Rush_Mid()
 
 void Default()
 {
+  //Bring intakes out
+  Actuate_Auto("out");
+  int x = 0;
+
+  while (x < 19) {
+    chassis.set_drive_pid(-9, 65);
+    chassis.wait_drive();
+
+    Intake_Auto(600);
+
+    chassis.set_turn_pid(-25, 50);
+    chassis.wait_drive();
+
+    pros::delay(20);
+    Catapult_Fire();
+    pros::delay(150);
+
+    chassis.set_turn_pid(0, 50);
+    chassis.wait_drive();
+
+    chassis.set_drive_pid(10, 50);
+    chassis.wait_drive();
+    x++;
+  }
+
+  chassis.set_drive_pid(-7, 65);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(-30, 50);
+  chassis.wait_drive();
+
+  pros::delay(20);
+  Catapult_Fire();
+  pros::delay(250);
+
+  //Turn to goals for wing movement
+  
+  chassis.set_turn_pid(-65, 75);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-28, 75);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(-45, 75);
+  chassis.wait_drive();
+
+  //Drive to goal and push in side of goal
+
+  chassis.set_drive_pid(-60, 90, true);
+  chassis.wait_drive();
+
+  Actuate_Auto("in");
+  Intake_Auto(0);
+  pros::delay(150);
+
+  chassis.set_turn_pid(0, 75);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-30, 75);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(45, 75);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-10, 100);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(5, 50);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-10, 100);
+  chassis.wait_drive();
+
+  //Go to wing deploy location
+
+  chassis.set_drive_pid(5, 75);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(135, 75);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-24, 75);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(90, 75);
+  chassis.wait_drive();
+
+  wingsAuto(true);
+
+  //Corral triballs
+
+  chassis.set_drive_pid(-24, 30);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(45, 50);
+  chassis.wait_drive();
+
+  //Turn to goal
+
+  chassis.set_drive_pid(-10, 50);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(-45, 50);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(-24, 100);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(18, 100);
+  chassis.wait_drive();
+
+  chassis.set_turn_pid(45, 75);
+  chassis.wait_drive();
+
+  chassis.set_drive_pid(12, 50);
+  chassis.wait_drive();
+
 
 }
 
